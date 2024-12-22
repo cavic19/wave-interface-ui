@@ -2,6 +2,8 @@
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+    font-family: "Playfair Display", serif;
+    color: white;
 }
 
 canvas {
@@ -10,6 +12,7 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: -2;
 }
 
 
@@ -17,4 +20,20 @@ body {
     width: 100vw;
     height: 100vh;
     background-color: #a8d0e6;
+    display: flex;
+}
+
+.section-1 {
+    height: 100%;
+    width: 75%;
+}
+
+.section-2 {
+    height: 100%;
+    width: 25%;
+    padding: 16px;
+}
+
+h2 {
+    font-weight: 400
 }

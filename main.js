@@ -1,11 +1,10 @@
 const FPS = 60;
 const TIME_STEP = 1000 / FPS;
-const VERTICAL_POINT_COUNT = 8;
+const VERTICAL_POINT_COUNT = 6;
 const MOUSE_PEN_DEPTH = 90;
 const MOUSE_FORCE = 0.5;
 
 
-// TLHO
 const DELTA = 0.05;
 // This conversion doesn't rly work...
 const FREQUENCY = 1 / TIME_STEP;
@@ -36,8 +35,6 @@ class Point {
         return this.x - this.initX;
     }
 }
-
-
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
