@@ -1,5 +1,5 @@
 # Wave intercae UI
-Very creative UI taken from https://waaark.com.
+Very creative UI taken from https://waaark.com. Check it out [here](https://cavic19.github.io/wave-interface-ui/).
 
 ## Solution
 On the first thought I thought I would need to solve a wave equation with Dirichlet boundary condition, which takes into account how the neighbouring elements affect each other. But after diescting the page code, I found out that the implementation can indeed be quite simple. 
