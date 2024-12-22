@@ -37,4 +37,5 @@ When fine tuning the coefficients make sure that $\delta^2 < \omega_0^2$ is met,
 We also need to set initial amplitudes and velocities of all the points. The positions will always be zeros and velocities will be determiend by the mouse movement!
 
 ### Bezier curves
-The effect of the continous wave is formed by employing the Bezier curves. Where the control points are the actual points, and points we are connecting are made up ones between the actual points (TODO: Explaion better)
+The effect of the continous wave is formed by employing the Bezier curves. Where the control points are the actual points, and points we are connecting are made up ones between the actual points (TODO: Explaion better)..
+![image](https://github.com/user-attachments/assets/4126645c-8c8b-4b17-9bd0-b39f31410790)
