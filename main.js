@@ -1,7 +1,10 @@
 const FPS = 60;
 const TIME_STEP = 1000 / FPS;
-const VERTICAL_POINT_COUNT = 6;
+const VERTICAL_POINT_COUNT = 8;
 const MOUSE_PEN_DEPTH = 90;
+const MOUSE_FORCE = 0.5;
+
+
 // TLHO
 const DELTA = 0.05;
 // This conversion doesn't rly work...
@@ -9,30 +12,15 @@ const FREQUENCY = 1 / TIME_STEP;
 const OMEGA_0 = 2 * Math.PI * FREQUENCY;
 
 
-// TODO: Set this to window.innerWidth + we have to set canvas, and that must happen on every resize event
-let windowWidth = 1920;
-let windowHeight = 1080;
-// Needs to be recalcualted on resize
-let waveBlockWidth = windowWidth / 4;
-let waveBlockHeight = windowHeight / 2;
-let verticalGap = windowHeight / (VERTICAL_POINT_COUNT - 1);
-
-
-
+let windowWidth = 0;
+let windowHeight = 0;
+let verticalPoints = [];
+let waveBlockWidth = 0;
 
 let mouseX = 0;
 let mouseY = 0;
 let mouseVX = 0;
 let mouseVY = 0;
-
-
-document.addEventListener('mousemove', (e) => {
-    mouseVX = e.pageX - mouseX;
-    mouseVY = e.pageY - mouseY;
-    mouseX = e.pageX;
-    mouseY = e.pageY;
-});
-
 
 class Point {
     constructor(x, y, vx, vy) {
@@ -50,15 +38,40 @@ class Point {
 }
 
 
+
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+
 window.addEventListener('resize', (e) => {
-    console.log(e.target.innerHeight)
+    initialiseCanvas(e.target.innerWidth, e.target.innerHeight);
 }, true);
 
-let verticalPoints = initialisePoints(windowWidth, waveBlockWidth);
+
+document.addEventListener('mousemove', (e) => {
+    mouseVX = e.pageX - mouseX;
+    mouseVY = e.pageY - mouseY;
+    mouseX = e.pageX;
+    mouseY = e.pageY;
+});
 
 
-function initialisePoints(windowWidth, waveBlockWidth) {
-    return new Array(VERTICAL_POINT_COUNT).fill(0).map((_, i) => (
+function main() {
+    initialiseCanvas(window.innerWidth, window.innerHeight);
+    setInterval(() => {
+        update();
+        draw();
+    }, TIME_STEP);
+}
+
+
+function initialiseCanvas(width, height) {
+    canvas.height = height;
+    canvas.width = width;
+    windowWidth = width;
+    windowHeight = height;
+    waveBlockWidth = windowWidth / 4;
+    verticalGap = windowHeight / (VERTICAL_POINT_COUNT - 1);
+    verticalPoints = new Array(VERTICAL_POINT_COUNT).fill(0).map((_, i) => (
         new Point(
             windowWidth - waveBlockWidth,
             i * verticalGap,
@@ -68,14 +81,19 @@ function initialisePoints(windowWidth, waveBlockWidth) {
     ));
 }
 
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
 
-function main() {
-    setInterval(() => {
-        update();
-        draw();
-    }, TIME_STEP);
+function update() {
+    for (const p of verticalPoints) {
+        const mouseDistanceX = Math.abs(p.initX - mouseX);
+        const mouseDistanceY = Math.abs(p.initY - mouseY);
+        if (mouseDistanceX < MOUSE_PEN_DEPTH && mouseDistanceY < verticalGap) {
+            // p.x = mouseX;
+            p.vx = mouseVX * MOUSE_FORCE;
+        } else {
+            p.vx = p.vx * (1 - 2 * DELTA) - OMEGA_0 ** 2 * p.amplitudeX();
+            p.x = p.x + p.vx;
+        }
+    }
 }
 
 
@@ -96,21 +114,6 @@ function draw() {
     ctx.closePath(); // Close the path to form a shape
     ctx.fillStyle = '#f56c6c'; // Set fill color
     ctx.fill(); // Fill the shape
-}
-
-
-function update() {
-    for (const p of verticalPoints) {
-        const mouseDistanceX = Math.abs(p.initX - mouseX);
-        const mouseDistanceY = Math.abs(p.initY - mouseY);
-        if (mouseDistanceX < MOUSE_PEN_DEPTH && mouseDistanceY < verticalGap) {
-            // p.x = mouseX;
-            p.vx = mouseVX;
-        } else {
-            p.vx = p.vx * (1 - 2 * DELTA) - OMEGA_0 ** 2 * p.amplitudeX();
-            p.x = p.x + p.vx;
-        }
-    }
 }
 
 main();
