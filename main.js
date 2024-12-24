@@ -1,40 +1,38 @@
+import { Point } from './point.js';
+// CONFIGURATION 
+// Frames per second
 const FPS = 60;
-const TIME_STEP = 1000 / FPS;
+// Time in seconds for the amplitude to decay to A / e.
+const TAU = 0.5
+// Frequency of the oscilation
+const FREQUENCY = 3;
+// Not rly force per se. The larger the number the bigger the cursor impact on the wave interface when crossing.
+const MOUSE_FORCE = 10;
 const VERTICAL_POINT_COUNT = 6;
-const MOUSE_PEN_DEPTH = 90;
-const MOUSE_FORCE = 0.5;
 
 
-const DELTA = 0.05;
-// This conversion doesn't rly work...
-const FREQUENCY = 1 / TIME_STEP;
-const OMEGA_0 = 2 * Math.PI * FREQUENCY;
+// CALCULATED PROPERTIES
+const TIME_STEP_MS = 1000 / FPS;
+const TIME_STEP_S = 1 / FPS;
+// The amplitude decayes with e^(-DELTA * t)
+const DELTA = 1 / TAU;
+// This also ensures that DELTA^2 < OMEGA_0^2
+const OMEGA_0_SQUARED = DELTA**2 + (2 * Math.PI * FREQUENCY)**2;
 
 
+// VARIABLE PROPERTIES
 let windowWidth = 0;
 let windowHeight = 0;
 let verticalPoints = [];
-let waveBlockWidth = 0;
+// Gap between neigbouring points
+let verticalGap = 0;
+// Position of the wave interface
+let waveInterfaceX = 0;
 
 let mouseX = 0;
 let mouseY = 0;
 let mouseVX = 0;
 let mouseVY = 0;
-
-class Point {
-    constructor(x, y, vx, vy) {
-        this.initX = x;
-        this.initY = y;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-    }
-
-    amplitudeX() {
-        return this.x - this.initX;
-    }
-}
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -57,7 +55,7 @@ function main() {
     setInterval(() => {
         update();
         draw();
-    }, TIME_STEP);
+    }, TIME_STEP_MS);
 }
 
 
@@ -66,11 +64,11 @@ function initialiseCanvas(width, height) {
     canvas.width = width;
     windowWidth = width;
     windowHeight = height;
-    waveBlockWidth = windowWidth / 4;
+    waveInterfaceX = windowWidth / 4;
     verticalGap = windowHeight / (VERTICAL_POINT_COUNT - 1);
     verticalPoints = new Array(VERTICAL_POINT_COUNT).fill(0).map((_, i) => (
         new Point(
-            windowWidth - waveBlockWidth,
+            windowWidth - waveInterfaceX,
             i * verticalGap,
             0,
             0
@@ -81,14 +79,11 @@ function initialiseCanvas(width, height) {
 
 function update() {
     for (const p of verticalPoints) {
-        const mouseDistanceX = Math.abs(p.initX - mouseX);
-        const mouseDistanceY = Math.abs(p.initY - mouseY);
-        if (mouseDistanceX < MOUSE_PEN_DEPTH && mouseDistanceY < verticalGap) {
-            // p.x = mouseX;
+        if (p.isClose(mouseX, mouseY, verticalGap)) {
             p.vx = mouseVX * MOUSE_FORCE;
         } else {
-            p.vx = p.vx * (1 - 2 * DELTA) - OMEGA_0 ** 2 * p.amplitudeX();
-            p.x = p.x + p.vx;
+            p.x = p.x + p.vx * TIME_STEP_S;
+            p.vx = p.vx * (1 - 2 * DELTA * TIME_STEP_S) - OMEGA_0_SQUARED * TIME_STEP_S * p.amplitudeX();
         }
     }
 }
@@ -108,9 +103,9 @@ function draw() {
     }
     ctx.lineTo(verticalPoints.at(-1).x, verticalPoints.at(-1).y);
     ctx.lineTo(windowWidth, windowHeight);
-    ctx.closePath(); // Close the path to form a shape
-    ctx.fillStyle = '#f56c6c'; // Set fill color
-    ctx.fill(); // Fill the shape
+    ctx.closePath();
+    ctx.fillStyle = '#f56c6c'; 
+    ctx.fill(); 
 }
 
 main();
