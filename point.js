@@ -12,10 +12,14 @@ export class Point {
         return this.x - this.initX;
     }
 
+    amplitudeY() {
+        return this.y - this.initY;
+    }
+
     /**
-     * Returns true if the point [x, y] is closer than distance to the initial position of this point 
-     */
+    * Returns true if the point [x, y] is closer than distance to the initial position of this point 
+    */
     isClose(x, y, distance) {
-        return Math.sqrt((this.initX - x)**2 + (this.initY - y)**2) <= distance
+        return Math.sqrt((this.initX - x) ** 2 + (this.initY - y) ** 2) <= distance
     }
 }

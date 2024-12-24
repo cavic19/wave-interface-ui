@@ -1,0 +1,1 @@
+Instead of having a single 1D interface, I created a regular polygon, and I connected the points with bezier curve in a way that mimics circular arch. Also the point now oscilate in 2D. 
