@@ -8,7 +8,7 @@ const TAU = 0.5
 // Frequency of the oscilation
 const FREQUENCY = 3;
 // Not rly force per se. The larger the number the bigger the cursor impact on the wave interface when crossing.
-const MOUSE_FORCE = 3;
+const MOUSE_FORCE = 5;
 
 // CALCULATED PROPERTIES
 const TIME_STEP_MS = 1000 / FPS;
@@ -87,8 +87,15 @@ function update() {
     for (const bubble of bubbles) {
         for (const p of bubble.points) {
             if (p.isClose(mouseX, mouseY, bubble.edgeLength / 2)) {
-                p.vx = mouseVX * MOUSE_FORCE;
-                p.vy = mouseVY * MOUSE_FORCE;
+                // Normal vector
+                // So the point move only in direction perpendicular to the tangent
+                const nX = p.initX - bubble.center.x;
+                const nY = p.initY - bubble.center.y;
+                const norm = Math.sqrt(nX**2 + nY**2);
+                
+                // You could as well use +=
+                p.vx = nX / norm * mouseVX * MOUSE_FORCE;
+                p.vy = nY / norm * mouseVY * MOUSE_FORCE;
             } else {
                 // Evolve x
                 p.vx = p.vx * (1 - 2 * DELTA * TIME_STEP_S) - OMEGA_0_SQUARED * TIME_STEP_S * p.amplitudeX();
